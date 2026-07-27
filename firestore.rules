@@ -1,0 +1,33 @@
+rules_version = '2';
+
+// Reglas de seguridad para la colección "votes".
+// Pegá esto en Firebase Console → Firestore Database → pestaña "Reglas".
+//
+// Qué permiten:
+//  - Cualquiera puede LEER los votos (para ver los resultados en vivo).
+//  - Cualquiera puede CREAR su propio voto, pero solo con la forma
+//    exacta que espera la app (nombre, voto válido, fecha).
+//  - Solo se puede ACTUALIZAR el campo "vote" (para cambiar el voto);
+//    el nombre y la fecha original no se pueden tocar.
+//  - Nadie puede BORRAR votos.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /votes/{voterId} {
+
+      allow read: if true;
+
+      allow create: if request.resource.data.keys().hasOnly(['name', 'vote', 'votedAt'])
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() > 0
+                    && request.resource.data.name.size() <= 30
+                    && request.resource.data.vote in ['varon', 'nena', 'nididea']
+                    && request.resource.data.votedAt is number;
+
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['vote'])
+                    && request.resource.data.vote in ['varon', 'nena', 'nididea'];
+
+      allow delete: if false;
+    }
+  }
+}
