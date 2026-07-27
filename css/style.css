@@ -42,6 +42,12 @@
 
 * { box-sizing: border-box; }
 
+/* El navegador oculta [hidden] con la misma prioridad que una clase normal,
+   así que .timer-box/.locked-box (que declaran su propio display) le ganaban
+   la pulseada y el elemento quedaba visible igual. Esta regla se asegura de
+   que "hidden" siempre gane, sin importar qué otra clase tenga el elemento. */
+[hidden] { display: none !important; }
+
 html, body {
   margin: 0;
   padding: 0;
